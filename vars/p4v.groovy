@@ -6,50 +6,11 @@ def init(p4credential, p4host, p4workspace, p4viewMapping, cleanForce = true)
    p4Info = [credential: p4credential, host: p4host, workspace: p4workspace, viewMapping: p4viewMapping]
    if (cleanForce)
    {
-      p4sync charset: 'none',
-             credential: p4Info.credential, // Keep using the passed credential (could be null)
-             format: 'jenkins-${JOB_NAME}',
-             populate: [
-                 $class: 'forceClean',
-                 have: false,
-                 parallel: [
-                     enable: true,
-                     minbytes: '1024',
-                     minfiles: '1',
-                     threads: '4'
-                 ],
-                 pin: '',
-                 quiet: true
-             ],
-             source: [
-                 $class: 'templateSource',
-                 workspace: p4Info.workspace // Let's try workspace name again as it's more logical.
-             ]
+      p4sync credential: p4Info.credential, format: 'jenkins-${JOB_NAME}'
    }
    else
    {
-      p4sync charset: 'none',
-             credential: p4Info.credential, // Keep using the passed credential (could be null)
-             format: 'jenkins-${JOB_NAME}',
-             populate: [
-                 $class: 'autoClean',
-                 delete: false,
-                 modtime: false,
-                 parallel: [
-                     enable: false,
-                     minbytes: '1024',
-                     minfiles: '1',
-                     threads: '4'
-                 ],
-                 pin: '',
-                 quiet: true,
-                 replace: true,
-                 tidy: false
-             ],
-             source: [
-                 $class: 'templateSource',
-                 workspace: p4Info.workspace // Let's try workspace name again as it's more logical.
-             ]
+      p4sync credential: p4Info.credential, format: 'jenkins-${JOB_NAME}'
    }
 }
 
