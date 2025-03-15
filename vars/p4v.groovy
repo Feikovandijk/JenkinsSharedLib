@@ -6,11 +6,21 @@ def init(p4credential, p4host, p4workspace, p4viewMapping, cleanForce = true)
    p4Info = [credential: p4credential, host: p4host, workspace: p4workspace, viewMapping: p4viewMapping]
    if (cleanForce)
    {
-      p4sync credential: null, format: 'jenkins-test-format' // Explicit null and static format
+      p4sync credential: null, format: 'jenkins-test-format',
+             workspace: p4Info.workspace, // Added explicit workspace here
+             source: [
+                 $class: 'templateSource',
+                 workspace: p4Info.workspace // Keep templateSource with workspace
+             ]
    }
    else
    {
-      p4sync credential: null, format: 'jenkins-test-format' // Explicit null and static format
+      p4sync credential: null, format: 'jenkins-test-format',
+             workspace: p4Info.workspace, // Added explicit workspace here
+             source: [
+                 $class: 'templateSource',
+                 workspace: p4Info.workspace // Keep templateSource with workspace
+             ]
    }
 }
 
