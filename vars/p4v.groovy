@@ -6,11 +6,11 @@ def init(p4credential, p4host, p4workspace, p4viewMapping, cleanForce = true)
    p4Info = [credential: p4credential, host: p4host, workspace: p4workspace, viewMapping: p4viewMapping]
    if (cleanForce)
    {
-      p4sync credential: p4Info.credential, format: 'jenkins-${JOB_NAME}'
+      p4sync credential: null, format: 'jenkins-test-format' // Explicit null and static format
    }
    else
    {
-      p4sync credential: p4Info.credential, format: 'jenkins-${JOB_NAME}'
+      p4sync credential: null, format: 'jenkins-test-format' // Explicit null and static format
    }
 }
 
