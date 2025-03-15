@@ -10,7 +10,7 @@ def init(p4credential, p4host, p4workspace, p4viewMapping, cleanForce = true)
              credential: p4Info.credential,
              format: 'jenkins-${JOB_NAME}',
              populate: [
-                 $class: 'forceClean', // Specify the class type
+                 $class: 'forceClean',
                  have: false,
                  parallel: [
                      enable: true,
@@ -22,8 +22,8 @@ def init(p4credential, p4host, p4workspace, p4viewMapping, cleanForce = true)
                  quiet: true
              ],
              source: [
-                 $class: 'templateSource', // Specify the class type
-                 workspace: p4Info.workspace
+                 $class: 'templateSource',
+                 workspace: p4Info.host // Changed from p4Info.workspace to p4Info.host
              ]
    }
    else
@@ -32,7 +32,7 @@ def init(p4credential, p4host, p4workspace, p4viewMapping, cleanForce = true)
              credential: p4Info.credential,
              format: 'jenkins-${JOB_NAME}',
              populate: [
-                 $class: 'autoClean', // Specify the class type
+                 $class: 'autoClean',
                  delete: false,
                  modtime: false,
                  parallel: [
@@ -47,8 +47,8 @@ def init(p4credential, p4host, p4workspace, p4viewMapping, cleanForce = true)
                  tidy: false
              ],
              source: [
-                 $class: 'templateSource', // Specify the class type
-                 workspace: p4Info.workspace
+                 $class: 'templateSource',
+                 workspace: p4Info.host // Changed from p4Info.workspace to p4Info.host
              ]
    }
 }
