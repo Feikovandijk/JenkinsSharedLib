@@ -10,38 +10,17 @@ def p4Info = null
  * @param p4workspace    Perforce workspace name.
  * @param p4viewMapping  Perforce view mapping string. e.g., "//depot/..." - "//workspace/..."
  */
-def init(p4credential, p4host, p4workspace, p4viewMapping) // Removed cleanForce parameter as it's not directly used in this simplified p4sync
+def init(p4credential, p4host, p4workspace, p4viewMapping, cleanForce = true)
 {
    p4Info = [credential: p4credential, host: p4host, workspace: p4workspace, viewMapping: p4viewMapping]
-
-   // Create Workspace object using manualSpec - CORRECT WAY to define workspace for p4sync
-   def workspaceObj = manualSpec(
-       charset: 'none',
-       cleanup: false, // Important: Do NOT cleanup workspace automatically here!
-       name: p4Info.workspace,
-       pinHost: false,
-       spec: clientSpec(
-           allwrite: true,
-           backup: true,
-           changeView: '',
-           clobber: false,
-           compress: false,
-           line: 'LOCAL',
-           locked: false,
-           modtime: false,
-           rmdir: false,
-           serverID: '',
-           streamName: '',
-           type: 'WRITABLE',
-           view: p4Info.viewMapping
-       )
-   )
-
-   // p4sync step now takes a Workspace object for the workspace parameter
-   p4sync charset: 'none',
-          credential: p4Info.credential,
-          format: 'jenkins-${JOB_NAME}',
-          workspace: workspaceObj // Pass the Workspace object here
+   if (cleanForce)
+   {
+      p4sync charset: 'none', credential: p4Info.credential, format: 'jenkins-${JOB_NAME}', populate: forceClean(have: false, parallel: [enable: true, minbytes: '1024', minfiles: '1', threads: '4'], pin: '', quiet: true), source: templateSource(p4Info.workspace)
+   }
+   else
+   {
+      p4sync charset: 'none', credential: p4Info.credential, format: 'jenkins-${JOB_NAME}', populate: autoClean(delete: false, modtime: false, parallel: [enable: false, minbytes: '1024', minfiles: '1', threads: '4'], pin: '', quiet: true, replace: true, tidy: false), source: templateSource(p4Info.workspace)
+   }
 }
 
 /**
