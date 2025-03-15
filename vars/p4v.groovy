@@ -6,11 +6,50 @@ def init(p4credential, p4host, p4workspace, p4viewMapping, cleanForce = true)
    p4Info = [credential: p4credential, host: p4host, workspace: p4workspace, viewMapping: p4viewMapping]
    if (cleanForce)
    {
-      p4sync charset: 'none', credential: p4Info.credential, format: 'jenkins-${JOB_NAME}', populate: forceClean(have: false, parallel: [enable: true, minbytes: '1024', minfiles: '1', threads: '4'], pin: '', quiet: true), source: templateSource(p4Info.workspace)
+      p4sync charset: 'none',
+             credential: p4Info.credential,
+             format: 'jenkins-${JOB_NAME}',
+             populate: [
+                 $class: 'forceClean', // Specify the class type
+                 have: false,
+                 parallel: [
+                     enable: true,
+                     minbytes: '1024',
+                     minfiles: '1',
+                     threads: '4'
+                 ],
+                 pin: '',
+                 quiet: true
+             ],
+             source: [
+                 $class: 'templateSource', // Specify the class type
+                 workspace: p4Info.workspace
+             ]
    }
    else
    {
-      p4sync charset: 'none', credential: p4Info.credential, format: 'jenkins-${JOB_NAME}', populate: autoClean(delete: false, modtime: false, parallel: [enable: false, minbytes: '1024', minfiles: '1', threads: '4'], pin: '', quiet: true, replace: true, tidy: false), source: templateSource(p4Info.workspace)
+      p4sync charset: 'none',
+             credential: p4Info.credential,
+             format: 'jenkins-${JOB_NAME}',
+             populate: [
+                 $class: 'autoClean', // Specify the class type
+                 delete: false,
+                 modtime: false,
+                 parallel: [
+                     enable: false,
+                     minbytes: '1024',
+                     minfiles: '1',
+                     threads: '4'
+                 ],
+                 pin: '',
+                 quiet: true,
+                 replace: true,
+                 tidy: false
+             ],
+             source: [
+                 $class: 'templateSource', // Specify the class type
+                 workspace: p4Info.workspace
+             ]
    }
 }
 
@@ -24,20 +63,20 @@ def clean()
 def createTicket()
 {
    def ticket = ""
-   withCredentials([usernamePassword(credentialsId: p4Info.credential, passwordVariable: 'P4PASS', usernameVariable: 'P4USER')]) 
+   withCredentials([usernamePassword(credentialsId: p4Info.credential, passwordVariable: 'P4PASS', usernameVariable: 'P4USER')])
    {
       bat (label: "Trust connection", script: "echo %P4PASS%| p4 -p ${p4Info.host} -u %P4USER% trust -y")
       def result = bat(label: "Create P4 ticket", script: "echo %P4PASS%| p4 -p ${p4Info.host} -u %P4USER% login -ap", returnStdout: true)
       ticket = result.tokenize().last()
    }
-   
+
    return ticket
 }
 
 def unshelve(id)
 {
    p4unshelve credential: p4Info.credential, ignoreEmpty: false, resolve: 'none', shelf: id, tidy: false, workspace: manualSpec(charset: 'none', cleanup: false, name: p4Info.workspace, pinHost: false, spec: clientSpec(allwrite: false, backup: true, changeView: '', clobber: true, compress: false, line: 'LOCAL', locked: false, modtime: false, rmdir: false, serverID: '', streamName: '', type: 'WRITABLE', view: p4Info.viewMapping))
-} 
+}
 
 def getChangelistDescr(id)
 {
@@ -45,9 +84,9 @@ def getChangelistDescr(id)
    def changeList = p4s.run('describe', '-s', '-S', "${id}")
    def desc = ""
 
-   for (def item : changeList) 
+   for (def item : changeList)
    {
-      for (String key : item.keySet()) 
+      for (String key : item.keySet())
       {
          if (key == "desc")
          {
