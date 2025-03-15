@@ -13,13 +13,35 @@ def p4Info = null
 def init(p4credential, p4host, p4workspace, p4viewMapping) // Removed cleanForce parameter as it's not directly used in this simplified p4sync
 {
    p4Info = [credential: p4credential, host: p4host, workspace: p4workspace, viewMapping: p4viewMapping]
-   // Simplified p4sync call to use only the essential parameters:
-   // charset, credential, format, and workspace.
-   // Removed populate and source configurations as they are not standard parameters for p4sync step.
+
+   // Create Workspace object using manualSpec - CORRECT WAY to define workspace for p4sync
+   def workspaceObj = manualSpec(
+       charset: 'none',
+       cleanup: false, // Important: Do NOT cleanup workspace automatically here!
+       name: p4Info.workspace,
+       pinHost: false,
+       spec: clientSpec(
+           allwrite: true,
+           backup: true,
+           changeView: '',
+           clobber: false,
+           compress: false,
+           line: 'LOCAL',
+           locked: false,
+           modtime: false,
+           rmdir: false,
+           serverID: '',
+           streamName: '',
+           type: 'WRITABLE',
+           view: p4Info.viewMapping
+       )
+   )
+
+   // p4sync step now takes a Workspace object for the workspace parameter
    p4sync charset: 'none',
           credential: p4Info.credential,
-          format: 'jenkins-${JOB_NAME}', // Corrected format string - removed backtick typo
-          workspace: p4Info.workspace
+          format: 'jenkins-${JOB_NAME}',
+          workspace: workspaceObj // Pass the Workspace object here
 }
 
 /**
@@ -38,8 +60,8 @@ def clear()
 def clean()
 {
    // Create a p4 object to interact with Perforce
-   def p4s = p4(credential: p4Info.credential,
-                 workspace: manualSpec(
+   def p4s = p4(credential: p4Info.credential, 
+                 workspace: manualSpec( // Reusing manualSpec here is correct for cleanup
                      charset: 'none',
                      cleanup: false,
                      name: p4Info.workspace,
@@ -134,7 +156,7 @@ def unshelve(id)
 def getChangelistDescr(id)
 {
    // Create a p4 object to interact with Perforce
-   def p4s = p4(credential: p4Info.credential,
+   def p4s = p4(credential: p4Info.credential, 
                  workspace: manualSpec(
                      charset: 'none',
                      cleanup: false,
