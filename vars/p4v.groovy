@@ -7,7 +7,7 @@ def init(p4credential, p4host, p4workspace, p4viewMapping, cleanForce = true)
    if (cleanForce)
    {
       p4sync charset: 'none',
-             credential: p4Info.credential,
+             credential: p4Info.credential, // Keep using the passed credential (could be null)
              format: 'jenkins-${JOB_NAME}',
              populate: [
                  $class: 'forceClean',
@@ -23,13 +23,13 @@ def init(p4credential, p4host, p4workspace, p4viewMapping, cleanForce = true)
              ],
              source: [
                  $class: 'templateSource',
-                 workspace: p4Info.workspace // Reverted back to p4Info.workspace
+                 workspace: p4Info.workspace // Let's try workspace name again as it's more logical.
              ]
    }
    else
    {
       p4sync charset: 'none',
-             credential: p4Info.credential,
+             credential: p4Info.credential, // Keep using the passed credential (could be null)
              format: 'jenkins-${JOB_NAME}',
              populate: [
                  $class: 'autoClean',
@@ -48,7 +48,7 @@ def init(p4credential, p4host, p4workspace, p4viewMapping, cleanForce = true)
              ],
              source: [
                  $class: 'templateSource',
-                 workspace: p4Info.workspace // Reverted back to p4Info.workspace
+                 workspace: p4Info.workspace // Let's try workspace name again as it's more logical.
              ]
    }
 }
