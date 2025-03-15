@@ -18,7 +18,7 @@ def init(p4credential, p4host, p4workspace, p4viewMapping) // Removed cleanForce
    // Removed populate and source configurations as they are not standard parameters for p4sync step.
    p4sync charset: 'none',
           credential: p4Info.credential,
-          format: 'jenkins-${JOB_NAME}', // Corrected format string - single quote at the end
+          format: 'jenkins-${JOB_NAME}', // Corrected format string - removed backtick typo
           workspace: p4Info.workspace
 }
 
