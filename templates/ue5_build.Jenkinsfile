@@ -3,7 +3,7 @@ library identifier: 'JenkinsSharedLib@master',
     retriever: modernSCM([
       $class: 'GitSCMSource',
       credentialsId: '', // Public repo, no credentials needed
-      remote: 'https://github.com/DavidtKate/JenkinsSharedLib'
+      remote: 'https://github.com/Feikovandijk/JenkinsSharedLib'
     ])
 
 pipeline {
@@ -22,7 +22,7 @@ pipeline {
         P4MAPPING = "<WORKSPACE_MAPPING>"
         
         // Unreal Engine 5
-        ENGINEROOT = "C:\\Program Files\\Epic Games\\UE_5.0\\"
+        ENGINEROOT = "<ENGINE_ROOT>" 
         PROJECT = "${env.WORKSPACE}\\<PROJECT>"
         PROJECTNAME = "<PROJECT_NAME>"
         OUTPUTDIR = "${env.WORKSPACE}\\Output"
