@@ -23,7 +23,7 @@ def init(p4credential, p4host, p4workspace, p4viewMapping, cleanForce = true)
              ],
              source: [
                  $class: 'templateSource',
-                 workspace: p4Info.host // Changed from p4Info.workspace to p4Info.host
+                 workspace: p4Info.workspace // Reverted back to p4Info.workspace
              ]
    }
    else
@@ -48,7 +48,7 @@ def init(p4credential, p4host, p4workspace, p4viewMapping, cleanForce = true)
              ],
              source: [
                  $class: 'templateSource',
-                 workspace: p4Info.host // Changed from p4Info.workspace to p4Info.host
+                 workspace: p4Info.workspace // Reverted back to p4Info.workspace
              ]
    }
 }
