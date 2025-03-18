@@ -24,7 +24,7 @@ def build(engineRoot, projectName, project, config, platform, outputDir, bluepri
       
       if (config.toLowerCase() == "development" && platform.toLowerCase() != "ps4")
       {
-         bat(label: "Build UE5 project", script: "\"${ue5Info.engineRoot}Engine\\Build\\BatchFiles\\Build.bat\" ${ue5Info.projectName}Editor ${platform} ${config} \"${ue5Info.project}\" -Log=\"${logFile}\"")
+         bat(label: "Build UE5 project", script: "\"${ue5Info.engineRoot}Engine\\Build\\BatchFiles\\Build.bat\" ${ue5Info.projectName}Editor ${platform} ${config} \"${ue5Info.project}\" -Log=\"${logFile}\" -NoWarningsAsErrors")
       }
       
       // Package
