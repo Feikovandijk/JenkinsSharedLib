@@ -20,7 +20,7 @@ def build(engineRoot, projectName, project, config, platform, outputDir, bluepri
    if (!blueprintOnly)
    {
       // Build
-      bat(label: "Run UnrealBuildTool", script: "\"${ue5Info.engineRoot}Engine\\Binaries\\DotNET\\UnrealBuildTool\\UnrealBuildTool.exe\" -projectfiles -project=\"${ue5Info.project}\" -Game -Rocket -Progress -NoIntellisense -WaitMutex -Platforms=\"${platform}\" PrecompileForTargets = PrecompileTargetsType.Any;")
+      bat(label: "Run UnrealBuildTool", script: "\"${ue5Info.engineRoot}Engine\\Binaries\\DotNET\\UnrealBuildTool\\UnrealBuildTool.exe\" -projectfiles -project=\"${ue5Info.project}\" -Game -Progress -NoIntellisense -WaitMutex -Platforms=\"${platform}\" PrecompileForTargets=PrecompileTargetsType.Any")
       
       if (config.toLowerCase() == "development" && platform.toLowerCase() != "ps4")
       {
@@ -28,12 +28,12 @@ def build(engineRoot, projectName, project, config, platform, outputDir, bluepri
       }
       
       // Package
-      bat(label: "Package UE5 project", script: "\"${ue5Info.engineRoot}Engine\\Build\\BatchFiles\\RunUAT.bat\" BuildCookRun -Project=\"${ue5Info.project}\" -NoP4 -Distribution -TargetPlatform=${platform} -Platform=${platform} -ClientConfig=${config} -ServerConfig=${config} -Cook -Allmaps -Build -Stage -Pak -Archive -Archivedirectory=\"${outputDir}\" -Rocket -Prereqs -Package -crashreporter")
+      bat(label: "Package UE5 project", script: "\"${ue5Info.engineRoot}Engine\\Build\\BatchFiles\\RunUAT.bat\" BuildCookRun -Project=\"${ue5Info.project}\" -NoP4 -Distribution -TargetPlatform=${platform} -Platform=${platform} -ClientConfig=${config} -ServerConfig=${config} -Cook -Allmaps -Build -Stage -Pak -Archive -Archivedirectory=\"${outputDir}\" -Prereqs -Package -crashreporter")
    }
    else
    {
       // Only package since we have a blueprintOnly project
-      bat(label: "Package UE5 project", script: "\"${ue5Info.engineRoot}Engine\\Build\\BatchFiles\\RunUAT.bat\" BuildCookRun -Project=\"${ue5Info.project}\" -NoP4 -Distribution -TargetPlatform=${platform} -Platform=${platform} -ClientConfig=${config} -ServerConfig=${config} -Cook -Allmaps -Build -Stage -Pak -Archive -Archivedirectory=\"${outputDir}\" -Rocket -Prereqs -Package")
+      bat(label: "Package UE5 project", script: "\"${ue5Info.engineRoot}Engine\\Build\\BatchFiles\\RunUAT.bat\" BuildCookRun -Project=\"${ue5Info.project}\" -NoP4 -Distribution -TargetPlatform=${platform} -Platform=${platform} -ClientConfig=${config} -ServerConfig=${config} -Cook -Allmaps -Build -Stage -Pak -Archive -Archivedirectory=\"${outputDir}\" -Prereqs -Package")
    }
 }
 
