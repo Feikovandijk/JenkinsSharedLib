@@ -6,22 +6,22 @@ def init(p4credential, p4host, p4workspace, p4viewMapping, cleanForce = true, st
     p4Info = [credential: p4credential, host: p4host, workspace: p4workspace, viewMapping: p4viewMapping]
 
     if (streamDepot) {
-        // Stream depot logic.
+        // Stream depot logic.  cleanForce is *only* a modifier *within* this block.
         if (cleanForce) {
-            // Stream depot WITH force clean
-            p4sync charset: 'none', credential: p4Info.credential, populate: forceClean(have: false, parallel: [enable: true, minbytes: '1024', minfiles: '1', threads: '4'], pin: '', quiet: true), source: streamSource(p4Info.workspace)
+            // Stream depot WITH force clean (rare, but possible)
+            p4sync charset: 'none', credential: p4Info.credential, populate: forceClean(have: false, parallel: [enable: true, minbytes: '1024', minfiles: '1', threads: '4'], pin: '', quiet: true), source: streamSource(stream: p4Info.viewMapping)
         } else {
-            // Stream depot with autoClean
-            p4sync charset: 'none', credential: p4Info.credential, populate: autoClean(delete: true, modtime: false, parallel: [enable: false, minbytes: '1024', minfiles: '1', threads: '4'], pin: '', quiet: true, replace: true, tidy: false), source: streamSource(p4Info.workspace)
+            // Stream depot with autoClean (typical stream setup)
+             p4sync charset: 'none', credential: p4Info.credential, populate: autoClean(delete: true, modtime: false, parallel: [enable: false, minbytes: '1024', minfiles: '1', threads: '4'], pin: '', quiet: true, replace: true, tidy: false), source: streamSource(stream: p4Info.viewMapping)
         }
     } else {
-        // Classic workspace logic.
+        // Classic (template) workspace logic.
         if (cleanForce) {
-            // Classic workspace with forceClean
-            p4sync charset: 'none', credential: p4Info.credential, format: 'jenkins-${JOB_NAME}', populate: forceClean(have: false, parallel: [enable: true, minbytes: '1024', minfiles: '1', threads: '4'], pin: '', quiet: true), source: templateSource(p4Info.workspace)
+            // Classic workspace with forceClean (typical non-stream setup)
+            p4sync charset: 'none', credential: p4Info.credential, format: 'jenkins-${JOB_NAME}', populate: forceClean(have: false, parallel: [enable: true, minbytes: '1024', minfiles: '1', threads: '4'], pin: '', quiet: true), source: templateSource(client: p4Info.workspace)
         } else {
-            // Classic workspace with autoClean
-            p4sync charset: 'none', credential: p4Info.credential, format: 'jenkins-${JOB_NAME}', populate: autoClean(delete: false, modtime: false, parallel: [enable: false, minbytes: '1024', minfiles: '1', threads: '4'], pin: '', quiet: true, replace: true, tidy: false), source: templateSource(p4Info.workspace)
+            // Classic workspace with autoClean (less common, but valid)
+            p4sync charset: 'none', credential: p4Info.credential, format: 'jenkins-${JOB_NAME}', populate: autoClean(delete: false, modtime: false, parallel: [enable: false, minbytes: '1024', minfiles: '1', threads: '4'], pin: '', quiet: true, replace: true, tidy: false), source: templateSource(client: p4Info.workspace)
         }
     }
 }
@@ -33,7 +33,7 @@ def clean()
     error("p4.init must be called before calling p4.clean")
     return
    }
-   def p4s = p4(credential: p4Info.credential, workspace: manualSpec(charset: 'none', cleanup: false, name: p4Info.workspace, pinHost: false, spec: clientSpec(allwrite: true, backup: true, changeView: '', clobber: false, compress: false, line: 'LOCAL', locked: false, modtime: false, rmdir: false, serverID: '', streamName: '', type: 'WRITABLE', view: p4Info.viewMapping)))
+   def p4s = p4(credential: p4Info.credential, workspace: manualSpec(charset: 'none', name: p4Info.workspace, view: p4Info.viewMapping))
    p4s.run('revert', '-c', 'default', '//...')
    // Don't clear p4Info here.  We might want to reuse it.  Let the pipeline control cleanup.
 }
@@ -63,7 +63,7 @@ def unshelve(id)
     error("p4.init must be called before calling p4.unshelve")
     return
    }
-   p4unshelve credential: p4Info.credential, ignoreEmpty: false, resolve: 'none', shelf: id, tidy: false, workspace: manualSpec(charset: 'none', cleanup: false, name: p4Info.workspace, pinHost: false, spec: clientSpec(allwrite: false, backup: true, changeView: '', clobber: true, compress: false, line: 'LOCAL', locked: false, modtime: false, rmdir: false, serverID: '', streamName: '', type: 'WRITABLE', view: p4Info.viewMapping))
+    p4unshelve credential: p4Info.credential, shelf: id, workspace: manualSpec(charset: 'none', name: p4Info.workspace, view: p4Info.viewMapping)
 }
 
 def getChangelistDescr(id)
@@ -73,7 +73,7 @@ def getChangelistDescr(id)
     error("p4.init must be called before calling p4.getChangelistDescr")
     return
    }
-   def p4s = p4(credential: p4Info.credential, workspace: manualSpec(charset: 'none', cleanup: false, name: p4Info.workspace, pinHost: false, spec: clientSpec(allwrite: true, backup: true, changeView: '', clobber: false, compress: false, line: 'LOCAL', locked: false, modtime: false, rmdir: false, serverID: '', streamName: '', type: 'WRITABLE', view: p4Info.viewMapping)))
+   def p4s = p4(credential: p4Info.credential, workspace: manualSpec(charset: 'none', name: p4Info.workspace, view: p4Info.viewMapping))
    def changeList = p4s.run('describe', '-s', '-S', "${id}")
    def desc = ""
 
