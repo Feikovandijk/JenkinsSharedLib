@@ -2,17 +2,17 @@
 def p4Info = null
 
 // Must be called first before calling other functions
-def init(p4credential, p4host, p4workspace, p4viewMapping, cleanForce = true, streamDepot = false) {
-    p4Info = [credential: p4credential, host: p4host, workspace: p4workspace, viewMapping: p4viewMapping]
+def init(p4credential, p4host, p4workspace, p4viewMapping, p4stream, cleanForce = true, streamDepot = false) {
+    p4Info = [credential: p4credential, host: p4host, workspace: p4workspace, viewMapping: p4viewMapping, stream: p4stream]
 
     if (streamDepot) {
         // Stream depot logic.  cleanForce is *only* a modifier *within* this block.
         if (cleanForce) {
             // Stream depot WITH force clean (rare, but possible)
-            p4sync charset: 'none', credential: p4Info.credential, populate: forceClean(have: false, parallel: [enable: true, minbytes: '1024', minfiles: '1', threads: '4'], pin: '', quiet: true), source: streamSource(p4Info.workspace)
+            p4sync charset: 'none', credential: p4Info.credential, populate: forceClean(have: false, parallel: [enable: true, minbytes: '1024', minfiles: '1', threads: '4'], pin: '', quiet: true), source: streamSource(p4Info.stream)
         } else {
             // Stream depot with autoClean (typical stream setup)
-            p4sync charset: 'none', credential: p4Info.credential, populate: autoClean(delete: true, modtime: false, parallel: [enable: false, minbytes: '1024', minfiles: '1', threads: '4'], pin: '', quiet: true, replace: true, tidy: false), source: streamSource(p4Info.workspace)
+            p4sync charset: 'none', credential: p4Info.credential, populate: autoClean(delete: true, modtime: false, parallel: [enable: false, minbytes: '1024', minfiles: '1', threads: '4'], pin: '', quiet: true, replace: true, tidy: false), source: streamSource(p4Info.stream)
         }
     } else {
         // Classic (template) workspace logic.
