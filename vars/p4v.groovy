@@ -28,39 +28,61 @@ def init(p4credential, p4host, p4workspace, p4viewMapping, p4stream, cleanForce 
 
 def clean()
 {
-   if (p4Info == null)
-   {
-    error("p4.init must be called before calling p4.clean")
-    return
-   }
+    if (p4Info == null) {
+        error("p4.init must be called before calling p4.clean")
+        return
+    }
 
-   // Use streamName instead of view for stream depot workspaces
-   def p4s = p4(
-       credential: p4Info.credential,
-       workspace: manualSpec(
-           charset: 'none',
-           cleanup: false,
-           name: p4Info.workspace,
-           pinHost: false,
-           spec: clientSpec(
-               allwrite: true,
-               backup: true,
-               changeView: '',
-               clobber: false,
-               compress: false,
-               line: 'LOCAL',
-               locked: false,
-               modtime: false,
-               rmdir: false,
-               serverID: '',
-               streamName: p4Info.stream, // <- Set stream name here
-               type: 'WRITABLE',
-               view: '' // <- Leave view empty for stream clients
-           )
-       )
-   )
+    def clientSpecConfig
 
-   p4s.run('revert', '-c', 'default', '//...')
+    if (p4Info.stream) {
+        // Stream depot client spec — use streamName, no view mapping
+        clientSpecConfig = clientSpec(
+            allwrite: true,
+            backup: true,
+            changeView: '',
+            clobber: false,
+            compress: false,
+            line: 'LOCAL',
+            locked: false,
+            modtime: false,
+            rmdir: false,
+            serverID: '',
+            streamName: p4Info.stream,  // Correct stream
+            type: 'WRITABLE',
+            view: ''  // NO view mapping for streams
+        )
+    } else {
+        // Classic workspace client spec — view mapping required
+        clientSpecConfig = clientSpec(
+            allwrite: true,
+            backup: true,
+            changeView: '',
+            clobber: false,
+            compress: false,
+            line: 'LOCAL',
+            locked: false,
+            modtime: false,
+            rmdir: false,
+            serverID: '',
+            streamName: '',
+            type: 'WRITABLE',
+            view: p4Info.viewMapping  // Valid mapping like //depot/... //client/...
+        )
+    }
+
+    def p4s = p4(
+        credential: p4Info.credential,
+        workspace: manualSpec(
+            charset: 'none',
+            cleanup: false,
+            name: p4Info.workspace,
+            pinHost: false,
+            spec: clientSpecConfig
+        )
+    )
+
+    p4s.run('revert', '-c', 'default', '//...')
 }
 
 def createTicket()
