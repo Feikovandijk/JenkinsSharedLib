@@ -70,7 +70,7 @@ def runFilteredTests(testFilter, config = "Development", platform = "Win64")
 def runAutomationCommand(testCommand, config = "Development", platform = "Win64")
 {
    log("Running tests in ${config} configuration on ${platform}")
-   def result = bat (label: "Run UE5 Automation Tests", script: "\"${ue5Info.engineRoot}Engine\\Binaries\\${platform}\\UnrealEditor-Cmd.exe\" \"${ue5Info.project}\" -stdout -fullstdlogoutput -buildmachine -nullrhi -unattended -NoPause -NoSplash -NoSound -ExecCmds=\"Automation ${testCommand};Quit\" -ReportExportPath=\"${env.WORKSPACE}\\Logs\\UnitTestsReport\"", returnStatus: true)
+   def result = bat (label: "Run UE5 Automation Tests", script: "\"${ue5Info.engineRoot}\\Binaries\\${platform}\\UnrealEditor-Cmd.exe\" \"${ue5Info.project}\" -stdout -fullstdlogoutput -buildmachine -nullrhi -unattended -NoPause -NoSplash -NoSound -ExecCmds=\"Automation ${testCommand};Quit\" -ReportExportPath=\"${env.WORKSPACE}\\Logs\\UnitTestsReport\"", returnStatus: true)
    
    if (result != 0)
    {
@@ -111,5 +111,5 @@ def getJUnitXMLContentFromJSON( String json_content ) {
 
 def fixupRedirects(platform = "Win64")
 {
-   bat(label: "Fix up redirectors in UE5 project", script: "\"${ue5Info.engineRoot}Engine\\Binaries\\${platform}\\UnrealEditor.exe\" \"${ue5Info.project}\" -run=ResavePackages -fixupredirects -autocheckout -projectonly -unattended -stdout")
+   bat(label: "Fix up redirectors in UE5 project", script: "\"${ue5Info.engineRoot}\\Binaries\\${platform}\\UnrealEditor.exe\" \"${ue5Info.project}\" -run=ResavePackages -fixupredirects -autocheckout -projectonly -unattended -stdout")
 }
