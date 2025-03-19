@@ -33,9 +33,34 @@ def clean()
     error("p4.init must be called before calling p4.clean")
     return
    }
-   def p4s = p4(credential: p4Info.credential, workspace: manualSpec(charset: 'none', cleanup: false, name: p4Info.workspace, pinHost: false, spec: clientSpec(allwrite: true, backup: true, changeView: '', clobber: false, compress: false, line: 'LOCAL', locked: false, modtime: false, rmdir: false, serverID: '', streamName: '', type: 'WRITABLE', view: p4Info.viewMapping)))
+
+   // Use streamName instead of view for stream depot workspaces
+   def p4s = p4(
+       credential: p4Info.credential,
+       workspace: manualSpec(
+           charset: 'none',
+           cleanup: false,
+           name: p4Info.workspace,
+           pinHost: false,
+           spec: clientSpec(
+               allwrite: true,
+               backup: true,
+               changeView: '',
+               clobber: false,
+               compress: false,
+               line: 'LOCAL',
+               locked: false,
+               modtime: false,
+               rmdir: false,
+               serverID: '',
+               streamName: p4Info.stream, // <- Set stream name here
+               type: 'WRITABLE',
+               view: '' // <- Leave view empty for stream clients
+           )
+       )
+   )
+
    p4s.run('revert', '-c', 'default', '//...')
-   // Don't clear p4Info here.  We might want to reuse it.  Let the pipeline control cleanup.
 }
 
 def createTicket()
