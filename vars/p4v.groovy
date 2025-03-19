@@ -3,7 +3,13 @@ def p4Info = null
 
 // Must be called first before calling other functions
 def init(p4credential, p4host, p4workspace, p4viewMapping, p4stream, cleanForce = true, streamDepot = false) {
-    p4Info = [credential: p4credential, host: p4host, workspace: p4workspace, viewMapping: p4viewMapping, stream: p4stream]
+    p4Info = [
+        credential: p4credential,
+        host: p4host,
+        workspace: p4workspace,
+        viewMapping: streamDepot ? '' : p4viewMapping,  // Prevent use in stream
+        stream: streamDepot ? p4stream : ''            // Use only for stream
+    ]
 
     if (streamDepot) {
         // Stream depot logic.  cleanForce is *only* a modifier *within* this block.
